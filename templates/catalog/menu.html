@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Menu · Maison Mourida{% endblock %}
+{% block content %}
+  <header class="mb-5">
+    <p class="m-0 text-sm text-gold">Maison Mourida</p>
+    <h1 class="m-0 text-3xl font-semibold tracking-tight text-wood">{{ heading|default:"Menu" }}</h1>
+    {% if deadline %}
+      <p class="m-0 mt-1 text-sm text-[#6d6458]">Commandes jusqu'au {{ deadline|date:"l j F à H:i" }}</p>
+    {% else %}
+      <p class="m-0 mt-1 text-sm text-[#6d6458]">Aucun menu publié pour le moment.</p>
+    {% endif %}
+  </header>
+
+  {% for day in days %}
+    <section class="mb-3 rounded-xl border border-[#e7dfd2] bg-white">
+      <h2 class="m-0 flex items-baseline gap-2 border-b border-[#f0e7da] px-4 py-3 text-base font-semibold text-wood">
+        {{ day.date|date:"l"|capfirst }}
+        <span class="text-sm font-medium text-[#6d6458]">{{ day.date|date:"j b" }}</span>
+      </h2>
+      <ul class="m-0 list-none p-0">
+        {% for mi in day.items %}
+          {% include "catalog/_carte_line.html" %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+
+  {% if juices %}
+    <section class="mt-5 rounded-xl border border-[#e7dfd2] bg-white">
+      <header class="border-b border-[#f0e7da] px-4 py-3">
+        <h2 class="m-0 flex items-center gap-2 text-xl font-semibold text-wood">
+          <svg class="h-6 w-6 text-bronze" aria-hidden="true"><use href="#i-glass"/></svg>
+          Jus locaux
+        </h2>
+        <p class="m-0 mt-1 text-sm text-[#6d6458]">250 ml, avec le plat de n'importe quel jour.</p>
+      </header>
+      <ul class="m-0 list-none p-0">
+        {% for mi in juices %}
+          {% include "catalog/_carte_line.html" %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body_class %}wide{% endblock %}
+{% block title %}Menus · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Carte</p>
+  <h1>Menus</h1>
+  <p class="lede">Un menu couvre la semaine. On y place chaque plat sur son jour, et chaque jus une seule fois, puis on publie.</p>
+  <p><a class="button primary" href="{% url 'menu_create' %}">Nouveau menu</a></p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Titre</th><th>Dates</th><th>Statut</th></tr></thead>
+      <tbody>
+        {% for menu in menus %}
+          <tr>
+            <td><a href="{% url 'menu_detail' menu.id %}">{{ menu.title }}</a></td>
+            <td>{{ menu.start_date|date:"j F" }} – {{ menu.end_date|date:"j F" }}</td>
+            <td>{{ menu.get_status_display }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3">Aucun menu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

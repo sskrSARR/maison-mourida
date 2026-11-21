@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Nouveau menu · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Carte</p>
+  <h1>Nouveau menu</h1>
+  <form method="post" class="stack narrow">
+    {% csrf_token %}
+    {% include "includes/fields.html" %}
+    <div class="form-actions">
+      <button class="primary" type="submit">Créer</button>
+    </div>
+  </form>
+{% endblock %}

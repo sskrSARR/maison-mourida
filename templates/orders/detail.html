@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}{{ order|reference }} · Maison Mourida{% endblock %}
+{% block body_class %}{% if is_vendor %}wide{% endif %}{% endblock %}
+{% block content %}
+  <p class="kicker">{% if order.subscription_id %}Abonné{% else %}Commande{% endif %}</p>
+  <h1>{{ order|reference }} <span class="status status-{{ order.status }}">{{ order.status|status_label }}</span></h1>
+  <p class="lede">{{ status_message }}</p>
+
+  <dl class="meta-list">
+    <div><dt>Livraison</dt><dd>{{ order.delivery_date|date:"l j F"|capfirst }} · {{ order.slot_label }}</dd></div>
+    <div><dt>Adresse</dt><dd>{{ order.address }}</dd></div>
+    <div><dt>Client</dt><dd>{{ order.client.name }} · {{ order.client.phone|tel }}</dd></div>
+  </dl>
+
+  {% if order.allergies.all or order.allergy_note %}
+    <p class="allergy">
+      Allergies :
+      {% for allergy in order.allergies.all %}{{ allergy.label }}{% if not forloop.last %}, {% endif %}{% endfor %}
+      {% if order.allergy_note %} — {{ order.allergy_note }}{% endif %}
+    </p>
+  {% endif %}
+  {% if order.preference_phrase %}<p>Préférences : {{ order.preference_phrase }}</p>{% endif %}
+  {% if order.note %}<p>Note : {{ order.note }}</p>{% endif %}
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Plat</th><th>Qté</th><th>Prix</th></tr></thead>
+      <tbody>
+        {% for line in order.lines.all %}
+          <tr>
+            <td>{{ line.menu_item.item.name }}</td>
+            <td>{{ line.quantity }}</td>
+            <td>{{ line.unit_price|fcfa }}</td>
+          </tr>
+        {% endfor %}
+        {% if order.delivery_fee %}
+          <tr><td>Livraison</td><td></td><td>{{ order.delivery_fee|fcfa }}</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+  <p class="total">Total {{ order.total|fcfa }}</p>
+
+  {% if order.status == "en_attente_paiement" or order.status == "paiement_a_verifier" %}
+    <section class="pay">
+      <h2>Paiement</h2>
+      <p>Envoyez <strong>{{ order.total|fcfa }}</strong> à {{ shop.beneficiary_name }}.</p>
+      {% if shop.wave_number %}<p>Wave · {{ shop.wave_number|tel }}</p>{% endif %}
+      {% if shop.om_number %}<p>Orange Money · {{ shop.om_number|tel }}</p>{% endif %}
+      <p>Référence à indiquer : <strong>{{ order|reference }}</strong></p>
+    </section>
+  {% endif %}
+
+  {% with payment=order.payments.all|first %}
+    {% if payment and payment.proof %}
+      <p class="hint">{{ payment.get_operator_display }}{% if payment.reference %} · {{ payment.reference }}{% endif %}</p>
+      <img class="proof" src="{% url 'proof_file' payment.id %}" alt="Capture de paiement">
+      {% if payment.status == "rejete" and payment.reject_reason %}
+        <p class="error">Paiement rejeté : {{ payment.reject_reason }}</p>
+      {% endif %}
+    {% endif %}
+
+    {% if not is_vendor and order.status == "en_attente_paiement" %}
+      <form method="post" action="{% url 'submit_payment' order.id %}" enctype="multipart/form-data" class="stack">
+        {% csrf_token %}
+        <div class="field">
+          <label for="operateur">Opérateur</label>
+          <select class="input" id="operateur" name="operateur">
+            <option value="wave">Wave</option>
+            <option value="orange_money">Orange Money</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="preuve">Capture d'écran</label>
+          <input id="preuve" name="preuve" type="file" accept="image/jpeg,image/png,image/webp" required>
+        </div>
+        <div class="field">
+          <label for="reference">Référence de transaction, si vous l'avez</label>
+          <input class="input" id="reference" name="reference">
+        </div>
+        <button class="primary block" type="submit">Envoyer la capture</button>
+      </form>
+    {% endif %}
+
+    {% if is_vendor and order.status == "paiement_a_verifier" and payment.status == "en_attente" %}
+      <div class="actions noprint">
+        <form method="post" action="{% url 'payment_validate' payment.id %}">
+          {% csrf_token %}
+          <button class="primary" type="submit">Valider le paiement</button>
+        </form>
+        <form method="post" action="{% url 'payment_reject' payment.id %}">
+          {% csrf_token %}
+          <label for="motif">Motif du rejet</label>
+          <input class="input" id="motif" name="motif" required>
+          <button type="submit">Rejeter</button>
+        </form>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% if is_vendor and vendor_buttons %}
+    <div class="actions noprint">
+      {% for value, label in vendor_buttons %}
+        <form method="post" action="{% url 'set_status' order.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="statut" value="{{ value }}">
+          {% if value == "annulee" %}
+            <label for="note-annulation">Motif</label>
+            <input class="input" id="note-annulation" name="note">
+          {% endif %}
+          <button type="submit" {% if value != "annulee" %}class="primary"{% endif %}>{{ label }}</button>
+        </form>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if can_cancel %}
+    <form class="noprint" method="post" action="{% url 'order_cancel' order.id %}">
+      {% csrf_token %}
+      <button type="submit">Annuler la commande</button>
+    </form>
+  {% endif %}
+
+  {% if not is_vendor and order.status != "annulee" %}
+    <form class="noprint" method="post" action="{% url 'reorder' order.id %}">
+      {% csrf_token %}
+      <button type="submit">Recommander</button>
+    </form>
+  {% endif %}
+
+  {% if whatsapp %}
+    <p class="noprint"><a class="button" href="{{ whatsapp }}" target="_blank" rel="noopener">Prévenir sur WhatsApp</a></p>
+  {% endif %}
+
+  {% if order.history.all %}
+    <h2>Historique</h2>
+    <ul class="history">
+      {% for row in order.history.all %}
+        <li>
+          <span class="meta">{{ row.created_at|date:"d/m, H:i" }}</span>
+          {{ row.new_status|status_label }}
+          {% if row.author %}· {{ row.author.name }}{% endif %}
+          {% if row.note %}<br>{{ row.note }}{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

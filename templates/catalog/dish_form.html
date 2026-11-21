@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Plat · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Catalogue</p>
+  <h1>{% if item %}Modifier {{ item.name }}{% else %}Nouveau plat{% endif %}</h1>
+  {% if item and item.photo %}
+    <img class="preview" src="{% url 'dish_photo' item.id %}" alt="">
+  {% endif %}
+  <form method="post" enctype="multipart/form-data" class="stack narrow">
+    {% csrf_token %}
+    {% include "includes/fields.html" %}
+    <div class="form-actions">
+      <button class="primary" type="submit">Enregistrer</button>
+    </div>
+  </form>
+{% endblock %}

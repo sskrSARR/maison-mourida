@@ -1,0 +1,182 @@
+{% load static shop_tags %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Maison Mourida{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            wood: "#1c1915",
+            bronze: "#6d5430",
+            gold: "#8a6840",
+            ivory: "#f6f3ee",
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="{% static 'app.css' %}?v=15">
+  <style>
+    header nav a, header nav a:hover { color: #efe6d8; text-decoration: none; }
+  </style>
+  <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+  <link rel="icon" href="{% static 'logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+  <meta name="theme-color" content="#1c1915">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mourida">
+</head>
+<body class="{% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' %}auth{% elif user.is_authenticated and user.role == 'vendeuse' or user.is_superuser %}app{% endif %} {% block body_class %}{% endblock %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7h12M8 12h12M8 17h12"/><path d="M4 7h.01M4 12h.01M4 17h.01"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><path d="M5 19c1.5-3 3.8-4.5 7-4.5S17.5 16 19 19"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-2z"/><path d="M8 11V8M12 11V6M16 11V8"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16H7.5A2.5 2.5 0 0 0 5 21.5z"/><path d="M5 5.5A2.5 2.5 0 0 1 7.5 8H20"/></symbol>
+    <symbol id="i-plate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v6M12 3v6M16 3v6M7 9h10M12 9v12"/></symbol>
+    <symbol id="i-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-1 8a3 3 0 0 1-6 0L8 3z"/><path d="M12 14v5M9 21h6"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="8" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+  </svg>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  {% if request.resolver_match.url_name == "login" or request.resolver_match.url_name == "register" %}
+    <div class="auth-wrap">
+      <a class="mark" href="{% url 'home' %}"><img class="logo" src="{% static 'logo.png' %}" alt="Maison Mourida"></a>
+  {% elif user.is_authenticated and user.role == "vendeuse" or user.is_superuser %}
+    <aside class="side">
+      <div class="side-head">
+        <a class="mark" href="{% url 'home' %}"><img class="logo" src="{% static 'logo.png' %}" alt="Maison Mourida"></a>
+      </div>
+      <nav>
+        <p class="nav-label">Vente</p>
+        <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == "dashboard" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-grid"/></svg><span class="nav-text">Tableau</span></a>
+        <a href="{% url 'kitchen' %}" {% if request.resolver_match.url_name == "kitchen" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-pot"/></svg><span class="nav-text">Cuisine</span></a>
+        <a href="{% url 'manage_orders' %}" {% if request.resolver_match.url_name == "manage_orders" or request.resolver_match.url_name == "order_detail" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-list"/></svg><span class="nav-text">Commandes</span></a>
+        <p class="nav-label">Carte</p>
+        <a href="{% url 'menus' %}" {% if request.resolver_match.url_name == "menus" or request.resolver_match.url_name == "menu_detail" or request.resolver_match.url_name == "menu_create" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-book"/></svg><span class="nav-text">Menus</span></a>
+        <a href="{% url 'dishes' %}" {% if "dish" in request.resolver_match.url_name %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-plate"/></svg><span class="nav-text">Plats et jus</span></a>
+        <p class="nav-label">Compte</p>
+        <a href="{% url 'shop_settings' %}" {% if request.resolver_match.url_name == "shop_settings" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-sliders"/></svg><span class="nav-text">Réglages</span></a>
+        <a href="{% url 'profile' %}" {% if request.resolver_match.url_name == "profile" %}aria-current="page"{% endif %}><svg class="ico"><use href="#i-user"/></svg><span class="nav-text">Profil</span></a>
+      </nav>
+      <div class="side-foot">
+        <div class="who">
+          <span class="avatar">{{ user.name|slice:":1"|upper }}</span>
+          <span class="who-text">
+            <strong>{{ user.name }}</strong>
+            <span>{% if user.is_superuser %}Administration{% else %}Vendeuse{% endif %}</span>
+          </span>
+        </div>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="link" type="submit">Déconnexion</button>
+        </form>
+      </div>
+    </aside>
+    <div class="workspace">
+  {% else %}
+    <div class="min-h-screen bg-ivory text-[#2b261f]">
+      <header class="sticky top-0 z-20 border-b border-white/10 bg-wood text-[#efe6d8]">
+        <div class="mx-auto flex max-w-3xl items-center gap-4 px-4 py-3">
+          <a href="{% url 'home' %}" class="shrink-0 no-underline">
+            <img src="{% static 'logo.png' %}" alt="Maison Mourida" class="h-12 w-auto rounded-md bg-white px-2 py-1">
+          </a>
+          <nav class="flex flex-1 items-center justify-end gap-1 text-sm">
+            <a href="{% url 'menu' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'menu' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
+              <svg class="h-[18px] w-[18px]"><use href="#i-menu"/></svg> Menu
+            </a>
+            <a href="{% url 'cart' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'cart' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
+              <svg class="h-[18px] w-[18px]"><use href="#i-bag"/></svg> Panier
+              {% if cart_count %}<span class="ml-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#c4a36a] px-1 text-[11px] font-bold text-wood">{{ cart_count }}</span>{% endif %}
+            </a>
+            <a href="{% url 'subscriptions' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'subscriptions' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
+              <svg class="h-[18px] w-[18px]"><use href="#i-cal"/></svg> Abonnements
+            </a>
+          </nav>
+        </div>
+      </header>
+  {% endif %}
+      {% if messages %}
+        <div class="flash">
+          {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <main id="contenu" class="{% if not user.is_authenticated or user.role != 'vendeuse' and not user.is_superuser %}mx-auto w-full max-w-3xl px-4 py-6{% endif %}">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  {% if cart_count and request.resolver_match.url_name != "cart" and user.role != "vendeuse" and not user.is_superuser %}
+    <a class="cartbar" href="{% url 'cart' %}">Panier · {{ cart_count }} · {{ cart_total|fcfa }}</a>
+  {% endif %}
+  <div class="install-bar" id="install-app" hidden>
+    <p id="install-app-text">Installer Maison Mourida sur le bureau</p>
+    <p class="install-hint" id="install-app-hint" hidden></p>
+    <button class="primary" type="button" id="install-app-go">Installer</button>
+    <button class="link" type="button" id="install-app-later">Plus tard</button>
+  </div>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("{% url 'service_worker' %}");
+    }
+    (function () {
+      var box = document.getElementById("install-app");
+      var go = document.getElementById("install-app-go");
+      var later = document.getElementById("install-app-later");
+      var text = document.getElementById("install-app-text");
+      var hint = document.getElementById("install-app-hint");
+      var deferred = null;
+      var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+      if (!box || standalone || localStorage.getItem("mourida-install-dismiss")) return;
+      var ua = navigator.userAgent;
+      var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      var android = /android/i.test(ua);
+      var phone = ios || android || (navigator.maxTouchPoints > 0 && window.matchMedia("(max-width: 860px)").matches);
+      window.addEventListener("beforeinstallprompt", function (event) {
+        event.preventDefault();
+        deferred = event;
+        text.textContent = phone ? "Ajouter l'icône sur l'écran d'accueil" : "Installer Maison Mourida sur le bureau";
+        hint.hidden = true;
+        go.hidden = false;
+        box.hidden = false;
+      });
+      if (ios) {
+        text.textContent = "Ajouter l'icône sur l'écran d'accueil";
+        hint.textContent = "Touchez Partager, puis Sur l'écran d'accueil.";
+        hint.hidden = false;
+        go.hidden = true;
+        box.hidden = false;
+      } else if (phone) {
+        text.textContent = "Ajouter l'icône sur l'écran d'accueil";
+        hint.textContent = "Menu du navigateur, puis Installer l'application ou Ajouter à l'écran d'accueil.";
+        hint.hidden = false;
+        box.hidden = false;
+      }
+      go.addEventListener("click", function () {
+        if (!deferred) {
+          hint.hidden = false;
+          return;
+        }
+        deferred.prompt();
+        deferred.userChoice.then(function () {
+          deferred = null;
+          box.hidden = true;
+        });
+      });
+      later.addEventListener("click", function () {
+        localStorage.setItem("mourida-install-dismiss", "1");
+        box.hidden = true;
+      });
+    })();
+  </script>
+</body>
+</html>

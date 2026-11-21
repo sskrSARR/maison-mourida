@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block body_class %}wide{% endblock %}
+{% block title %}{{ menu.title }} · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">{{ menu.get_status_display }}</p>
+  <h1>{{ menu.title }}</h1>
+  <p class="lede">Limite de commande : {{ menu.order_deadline|date:"l j F à H:i" }}.</p>
+
+  <form method="post" class="stack">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save">
+    {% include "includes/fields.html" with form=edit_form %}
+    <div class="form-actions">
+      <button class="primary" type="submit">Enregistrer les dates</button>
+    </div>
+  </form>
+
+  <h2>Plats du menu</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Jour</th><th>Plat</th><th>Prix</th><th>Reste</th><th></th></tr></thead>
+      <tbody>
+        {% for mi in items %}
+          <tr>
+            <td>{% if mi.item.category == "jus" %}Toute la semaine{% else %}{{ mi.service_date|date:"d/m/Y" }}{% endif %}</td>
+            <td>{{ mi.item.name }}</td>
+            <td>{{ mi.unit_price|fcfa }}</td>
+            <td>
+              <form method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="stock">
+                <input type="hidden" name="menu_item" value="{{ mi.id }}">
+                <input class="input tiny" type="number" name="remaining" min="0" value="{{ mi.remaining_quantity }}">
+                <button type="submit">Mettre à jour</button>
+              </form>
+            </td>
+            <td>
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove">
+                <input type="hidden" name="menu_item" value="{{ mi.id }}">
+                <button type="submit">Retirer</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">Aucun plat sur ce menu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if menu.status != "clos" %}
+    <h2>Ajouter un plat ou un jus</h2>
+    <form id="ajouter-plat" method="post" class="stack">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add">
+      {% include "includes/fields.html" with form=item_form %}
+    </form>
+  {% endif %}
+
+  <div class="form-actions">
+    {% if menu.status != "clos" %}
+      <button class="primary" type="submit" form="ajouter-plat">Ajouter</button>
+    {% endif %}
+    {% if menu.status != "publie" and menu.status != "clos" %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="publish">
+        <button class="primary" type="submit">Publier</button>
+      </form>
+    {% endif %}
+    {% if menu.status == "publie" %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="close">
+        <button type="submit">Clore</button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

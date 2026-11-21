@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Inscription · Maison Mourida{% endblock %}
+{% block content %}
+  <div class="narrow">
+    <p class="kicker">Compte</p>
+    <h1>Inscription</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% include "includes/fields.html" %}
+      <button class="primary" type="submit">Créer le compte</button>
+    </form>
+    <p class="hint"><a href="{% url 'login' %}">Déjà inscrit</a></p>
+  </div>
+{% endblock %}

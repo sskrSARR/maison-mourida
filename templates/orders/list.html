@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Mes commandes · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Suivi</p>
+  <h1>Mes commandes</h1>
+  {% if not orders %}
+    <p class="lede">Vous n'avez pas encore commandé.</p>
+    <a class="button" href="{% url 'menu' %}">Voir le menu</a>
+  {% else %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Réf.</th><th>Jour</th><th>Statut</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td><a href="{% url 'order_detail' order.id %}">{{ order|reference }}</a></td>
+              <td>{{ order.delivery_date|date:"d/m/Y" }}</td>
+              <td><span class="status status-{{ order.status }}">{{ order.status|status_label }}</span></td>
+              <td>{{ order.total|fcfa }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endblock %}

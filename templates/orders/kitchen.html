@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block body_class %}wide{% endblock %}
+{% block title %}Cuisine · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Préparation</p>
+  <h1>{{ day|date:"l j F"|capfirst }}</h1>
+  <p class="noprint actions">
+    <a href="?date={{ prev|date:'Y-m-d' }}">Jour précédent</a>
+    <a href="?date={{ next|date:'Y-m-d' }}">Jour suivant</a>
+    <button type="button" onclick="window.print()">Imprimer</button>
+  </p>
+  {% if pending %}
+    <p class="hint">{{ pending }} paiement{{ pending|pluralize }} encore à vérifier, non compté{{ pending|pluralize }} ici.</p>
+  {% endif %}
+  {% if not orders %}
+    <p class="lede">Aucune commande payée pour cette date.</p>
+  {% else %}
+    <h2>À préparer</h2>
+    <ul class="totals">
+      {% for row in totals %}
+        <li><strong>{{ row.qty }}</strong> {{ row.menu_item__item__name }}</li>
+      {% endfor %}
+    </ul>
+    {% for order in orders %}
+      <article class="ticket">
+        <header>
+          <h2>{{ order|reference }} · {{ order.client.name }}</h2>
+          <p>{{ order.slot_label }} · {{ order.client.phone|tel }}</p>
+          <p>{{ order.address }}</p>
+          {% if order.subscription_id %}<p class="kicker">Abonné</p>{% endif %}
+        </header>
+        <ul>
+          {% for line in order.lines.all %}
+            <li>{{ line.quantity }} × {{ line.menu_item.item.name }}</li>
+          {% endfor %}
+        </ul>
+        {% if order.allergies.all or order.allergy_note %}
+          <p class="allergy">
+            Allergies :
+            {% for allergy in order.allergies.all %}{{ allergy.label }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            {% if order.allergy_note %} — {{ order.allergy_note }}{% endif %}
+          </p>
+        {% endif %}
+        {% if order.preference_phrase %}<p>Préférences : {{ order.preference_phrase }}</p>{% endif %}
+        {% if order.note %}<p>Note : {{ order.note }}</p>{% endif %}
+      </article>
+    {% endfor %}
+  {% endif %}
+{% endblock %}

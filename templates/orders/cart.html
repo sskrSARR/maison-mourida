@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Panier · Maison Mourida{% endblock %}
+{% block content %}
+  {% if not lines %}
+    <p class="kicker">Commande</p>
+    <h1>Panier</h1>
+    <p class="lede">Le panier est vide.</p>
+    <a class="button primary" href="{% url 'menu' %}">Voir le menu</a>
+  {% else %}
+    <div class="ticket">
+      <section class="ticket-bill">
+        <p class="kicker">Commande</p>
+        <h1>Panier</h1>
+        {% if day %}<p class="lede">{{ day|date:"l j F"|capfirst }}</p>{% endif %}
+        <ul class="bill">
+          {% for line in lines %}
+            <li>
+              <div>
+                <h3>{{ line.menu_item.item.name }}</h3>
+                <p>{{ line.price|fcfa }}</p>
+              </div>
+              <form class="stepper" method="post" action="{% url 'cart_add' %}">
+                {% csrf_token %}
+                <input type="hidden" name="menu_item" value="{{ line.menu_item.id }}">
+                <input type="hidden" name="mode" value="set">
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button type="submit" name="qty" value="{{ line.qty|add:"-1" }}" aria-label="Diminuer {{ line.menu_item.item.name }}">−</button>
+                <span>{{ line.qty }}</span>
+                <button type="submit" name="qty" value="{{ line.qty|add:"1" }}" aria-label="Augmenter {{ line.menu_item.item.name }}" {% if line.qty >= 20 %}disabled{% endif %}>+</button>
+              </form>
+              <strong>{{ line.price|multiply:line.qty|fcfa }}</strong>
+            </li>
+          {% endfor %}
+        </ul>
+        <dl class="sums">
+          <div><dt>Plats</dt><dd>{{ subtotal|fcfa }}</dd></div>
+          <div><dt>Livraison</dt><dd>{% if shop.delivery_fee %}{{ shop.delivery_fee|fcfa }}{% else %}Offerte{% endif %}</dd></div>
+          <div class="sum-total"><dt>Total</dt><dd>{{ total|fcfa }}</dd></div>
+        </dl>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="vider">
+          <button type="submit">Vider le panier</button>
+        </form>
+      </section>
+
+      <section class="ticket-form">
+        <h2>Qui reçoit</h2>
+        <p class="lede">Aucun compte n'est demandé.</p>
+        <form method="post" action="{% url 'orders' %}" class="order">
+          {% csrf_token %}
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input class="input" id="nom" name="nom" required value="{{ client_name }}" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input class="input" id="telephone" name="telephone" required inputmode="tel" autocomplete="tel" placeholder="77 123 45 67" value="{{ client_phone }}">
+          </div>
+          <div class="field">
+            <label for="adresse">Adresse de livraison</label>
+            <input class="input" id="adresse" name="adresse" required value="{{ address }}" autocomplete="street-address">
+          </div>
+          <div class="field">
+            <label for="creneau">Créneau</label>
+            <select class="input" id="creneau" name="creneau" required>
+              {% for value, label in slots %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <h2>Allergies</h2>
+          <fieldset>
+            <legend>Cochez ce qui vous concerne</legend>
+            <div class="choices">
+              {% for allergy in allergies %}
+                <label><input type="checkbox" name="allergies" value="{{ allergy.id }}" {% if allergy.id in selected_allergies %}checked{% endif %}> {{ allergy.label }}</label>
+              {% empty %}
+                <p class="hint">Aucune allergie n'est proposée pour le moment.</p>
+              {% endfor %}
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="allergy_note">Autre précision</label>
+            <input class="input" id="allergy_note" name="allergy_note" value="{{ allergy_note }}" maxlength="300" placeholder="Exemple : pas de crevettes">
+          </div>
+
+          <h2>Préférences</h2>
+          <fieldset>
+            <legend>Pour cette commande</legend>
+            <div class="choices">
+              <label><input type="radio" name="piment" value="aucun" {% if piment == "aucun" %}checked{% endif %}> Aucun piment</label>
+              <label><input type="radio" name="piment" value="doux" {% if piment == "doux" %}checked{% endif %}> Piment doux</label>
+              <label><input type="radio" name="piment" value="fort" {% if piment == "fort" %}checked{% endif %}> Piment fort</label>
+              <label><input type="checkbox" name="ketchup" {% if ketchup %}checked{% endif %}> Ketchup</label>
+              <label><input type="checkbox" name="mayonnaise" {% if mayonnaise %}checked{% endif %}> Mayonnaise</label>
+              <label><input type="checkbox" name="sans_oignon" {% if sans_oignon %}checked{% endif %}> Sans oignon</label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="note">Note pour la cuisine</label>
+            <textarea class="input" id="note" name="note" rows="3"></textarea>
+          </div>
+          <label class="check">
+            <input type="checkbox" name="souvenir" {% if remembered %}checked{% endif %}>
+            <span>Se souvenir de moi sur cet appareil</span>
+          </label>
+          <button class="primary block" type="submit">Commander</button>
+        </form>
+      </section>
+    </div>
+  {% endif %}
+{% endblock %}

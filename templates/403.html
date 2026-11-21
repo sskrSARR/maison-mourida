@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Accès refusé · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Accès</p>
+  <h1>Cette page est réservée.</h1>
+  <p class="lede">Votre compte ne peut pas ouvrir cet écran.</p>
+  <a class="button" href="{% url 'home' %}">Retour</a>
+{% endblock %}

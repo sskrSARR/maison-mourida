@@ -1,0 +1,30 @@
+{% load shop_tags %}
+<li class="flex items-center gap-3 border-b border-[#f6f1ea] px-4 py-3 last:border-b-0 {% if mi.remaining_quantity <= 0 %}opacity-50{% endif %}">
+  <svg class="h-6 w-6 shrink-0 text-bronze" aria-hidden="true"><use href="{% if mi.item.category == 'jus' %}#i-glass{% else %}#i-plate{% endif %}"/></svg>
+  <div class="min-w-0 flex-1">
+    {% if mi.item.photo %}
+      <img src="{% url 'dish_photo' mi.item_id %}" alt="" class="mb-2 h-28 w-full rounded-md object-cover">
+    {% endif %}
+    <h3 class="m-0 text-base font-semibold text-wood">{{ mi.item.name }}</h3>
+    {% if mi.item.description %}<p class="m-0 mt-0.5 text-sm text-[#6d6458]">{{ mi.item.description }}</p>{% endif %}
+    {% if mi.remaining_quantity <= 0 %}
+      <p class="m-0 mt-0.5 text-sm text-[#9b2c2c]">Épuisé</p>
+    {% elif mi.remaining_quantity <= 3 %}
+      <p class="m-0 mt-0.5 text-sm text-[#9b2c2c]">Plus que {{ mi.remaining_quantity }}</p>
+    {% endif %}
+  </div>
+  <div class="flex shrink-0 items-center gap-3">
+    <strong class="whitespace-nowrap text-base text-gold">{{ mi.unit_price|fcfa }}</strong>
+    {% if mi.remaining_quantity > 0 and mi.menu.order_deadline > now and user.role != "vendeuse" and not user.is_superuser %}
+      <form method="post" action="{% url 'cart_add' %}" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="menu_item" value="{{ mi.id }}">
+        <input type="hidden" name="qty" value="1">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button class="primary icon-add" type="submit" aria-label="Ajouter {{ mi.item.name }}">+</button>
+      </form>
+    {% elif mi.menu.order_deadline <= now %}
+      <p class="m-0 text-sm text-[#9b2c2c]">Commandes closes</p>
+    {% endif %}
+  </div>
+</li>

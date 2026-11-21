@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Abonnements · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Plus tard</p>
+  <h1>Abonnements</h1>
+  <p class="lede">Les formules hebdomadaires et mensuelles s'ouvriront quand les commandes à l'unité auront tourné une première semaine. Le paiement restera une capture Wave ou Orange Money, validée à la main.</p>
+  <ul class="formulas">
+    {% for name, rhythm, detail in formulas %}
+      <li>
+        <h2>{{ name }}</h2>
+        <p class="meta">{{ rhythm }}</p>
+        <p>{{ detail }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

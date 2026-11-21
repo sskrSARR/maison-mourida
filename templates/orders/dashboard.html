@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block body_class %}wide{% endblock %}
+{% block title %}Tableau · Maison Mourida{% endblock %}
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="kicker">{{ today|date:"l j F"|capfirst }}</p>
+      <h1>Tableau</h1>
+    </div>
+    <a class="button" href="{% url 'export_csv' %}">Export CSV</a>
+  </header>
+  <ul class="doors">
+    <li><a href="{% url 'dishes' %}"><strong>Plats et jus</strong><span>Créer un plat ou un jus, avec son prix.</span></a></li>
+    <li><a href="{% url 'menus' %}"><strong>Menus</strong><span>Composer la semaine, puis publier.</span></a></li>
+    <li><a href="{% url 'shop_settings' %}"><strong>Réglages</strong><span>Livraison, Wave et Orange Money.</span></a></li>
+  </ul>
+  <ul class="figures">
+    <li><span>Aujourd'hui</span><strong>{{ revenue_today|fcfa }}</strong></li>
+    <li><span>Cette semaine</span><strong>{{ revenue_week|fcfa }}</strong></li>
+    <li><span>Ce mois</span><strong>{{ revenue_month|fcfa }}</strong></li>
+  </ul>
+  <div class="queue">
+    <a href="{% url 'manage_orders' %}?statut=paiement_a_verifier">
+      <strong>{{ to_check }}</strong>
+      <span>paiement{{ to_check|pluralize }} à vérifier</span>
+    </a>
+    <div>
+      <strong>{{ unpaid }}</strong>
+      <span>impayée{{ unpaid|pluralize }}</span>
+    </div>
+  </div>
+  <h2>Plats du mois</h2>
+  {% if top %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Plat</th><th>Quantité</th><th>Montant</th></tr></thead>
+        <tbody>
+          {% for row in top %}
+            <tr>
+              <td>{{ row.menu_item__item__name }}</td>
+              <td>{{ row.qty }}</td>
+              <td>{{ row.amount|fcfa }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="lede">Pas encore de vente ce mois-ci.</p>
+  {% endif %}
+  {% if alerts %}
+    <h2>Derniers messages</h2>
+    <ul class="history">
+      {% for alert in alerts %}
+        <li><time>{{ alert.created_at|date:"d/m H:i" }}</time> {{ alert.content }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

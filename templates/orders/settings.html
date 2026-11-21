@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body_class %}wide{% endblock %}
+{% block title %}Réglages · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Boutique</p>
+  <h1>Réglages</h1>
+  <form method="post" class="stack narrow">
+    {% csrf_token %}
+    <div class="field"><label for="beneficiary_name">Nom du bénéficiaire</label><input class="input" id="beneficiary_name" name="beneficiary_name" value="{{ shop.beneficiary_name }}"></div>
+    <div class="field"><label for="wave_number">Numéro Wave</label><input class="input" id="wave_number" name="wave_number" value="{{ shop.wave_number }}"></div>
+    <div class="field"><label for="om_number">Numéro Orange Money</label><input class="input" id="om_number" name="om_number" value="{{ shop.om_number }}"></div>
+    <div class="field"><label for="whatsapp_number">WhatsApp</label><input class="input" id="whatsapp_number" name="whatsapp_number" value="{{ shop.whatsapp_number }}"></div>
+    <div class="field">
+      <label for="delivery_fee">Frais de livraison (FCFA)</label>
+      <input class="input" id="delivery_fee" name="delivery_fee" type="number" min="0" value="{{ shop.delivery_fee }}">
+      <p class="hint">Saisi ici par la vendeuse. Ce montant s'ajoute au panier. 0 si la livraison n'est pas facturée.</p>
+    </div>
+    <div class="field"><label for="unpaid_timeout_hours">Délai avant annulation d'un impayé (heures)</label><input class="input" id="unpaid_timeout_hours" name="unpaid_timeout_hours" type="number" min="1" value="{{ shop.unpaid_timeout_hours }}"></div>
+    <div class="form-actions">
+      <button class="primary" type="submit">Enregistrer</button>
+    </div>
+  </form>
+{% endblock %}

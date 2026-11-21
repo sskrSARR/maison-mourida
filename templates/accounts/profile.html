@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Profil · Maison Mourida{% endblock %}
+{% block content %}
+  <p class="kicker">Compte</p>
+  <h1>Profil</h1>
+  <p class="lede">{{ user.name }} · {{ user.phone|tel }}</p>
+  <form method="post" class="stack">
+    {% csrf_token %}
+    {% include "includes/fields.html" %}
+    <button class="primary" type="submit">Enregistrer</button>
+  </form>
+{% endblock %}

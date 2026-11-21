@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Connexion · Maison Mourida{% endblock %}
+{% block content %}
+  <div class="narrow">
+    <p class="kicker">Cuisine</p>
+    <h1>Connexion</h1>
+    <p class="lede">Ici la vendeuse ajoute ses plats, ses jus, ses menus, et règle la livraison.</p>
+    <form method="post">
+      {% csrf_token %}
+      {% include "includes/fields.html" %}
+      <button class="primary block" type="submit">Entrer</button>
+    </form>
+    {% if show_demo %}
+      <p class="note">Démonstration vendeuse<br>77 000 00 01 · cuisine</p>
+    {% endif %}
+  </div>
+{% endblock %}

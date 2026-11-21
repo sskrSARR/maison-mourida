@@ -1,0 +1,16 @@
+{
+  "name": "Maison Mourida",
+  "short_name": "Mourida",
+  "description": "Commander les plats de la semaine",
+  "start_url": "/menu/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f3ee",
+  "theme_color": "#1c1915",
+  "lang": "fr",
+  "icons": [
+    {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/static/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

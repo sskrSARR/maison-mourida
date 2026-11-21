@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gestcmd
+      POSTGRES_USER: gestcmd
+      POSTGRES_PASSWORD: gestcmd
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gestcmd -d gestcmd"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  web:
+    build: .
+    ports:
+      - "8095:8000"
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_SECRET_KEY: "dev-only-change-me"
+      DATABASE_URL: "postgresql://gestcmd:gestcmd@db:5432/gestcmd"
+      TASK_TOKEN: "dev-task-token"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,web"
+      CSRF_TRUSTED_ORIGINS: "http://localhost:8095,http://127.0.0.1:8095"
+    volumes:
+      - ./:/app
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  media:
