@@ -20,7 +20,7 @@
       },
     };
   </script>
-  <link rel="stylesheet" href="{% static 'app.css' %}?v=15">
+  <link rel="stylesheet" href="{% static 'app.css' %}?v=19">
   <style>
     header nav a, header nav a:hover { color: #efe6d8; text-decoration: none; }
   </style>
@@ -82,22 +82,22 @@
     </aside>
     <div class="workspace">
   {% else %}
-    <div class="min-h-screen bg-ivory text-[#2b261f]">
-      <header class="sticky top-0 z-20 border-b border-white/10 bg-wood text-[#efe6d8]">
-        <div class="mx-auto flex max-w-3xl items-center gap-4 px-4 py-3">
-          <a href="{% url 'home' %}" class="shrink-0 no-underline">
-            <img src="{% static 'logo.png' %}" alt="Maison Mourida" class="h-12 w-auto rounded-md bg-white px-2 py-1">
+    <div class="shell">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <a class="topbar-logo" href="{% url 'home' %}">
+            <img src="{% static 'logo.png' %}" alt="Maison Mourida">
           </a>
-          <nav class="flex flex-1 items-center justify-end gap-1 text-sm">
-            <a href="{% url 'menu' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'menu' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
-              <svg class="h-[18px] w-[18px]"><use href="#i-menu"/></svg> Menu
+          <nav class="topbar-nav">
+            <a href="{% url 'menu' %}" {% if request.resolver_match.url_name == 'menu' %}aria-current="page"{% endif %}>
+              <svg class="ico"><use href="#i-menu"/></svg><span>Menu</span>
             </a>
-            <a href="{% url 'cart' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'cart' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
-              <svg class="h-[18px] w-[18px]"><use href="#i-bag"/></svg> Panier
-              {% if cart_count %}<span class="ml-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#c4a36a] px-1 text-[11px] font-bold text-wood">{{ cart_count }}</span>{% endif %}
+            <a href="{% url 'cart' %}" {% if request.resolver_match.url_name == 'cart' %}aria-current="page"{% endif %}>
+              <svg class="ico"><use href="#i-bag"/></svg><span>Panier</span>
+              {% if cart_count %}<span class="count">{{ cart_count }}</span>{% endif %}
             </a>
-            <a href="{% url 'subscriptions' %}" class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 no-underline hover:!text-white {% if request.resolver_match.url_name == 'subscriptions' %}bg-white/10 text-white{% else %}text-[#efe6d8]{% endif %}">
-              <svg class="h-[18px] w-[18px]"><use href="#i-cal"/></svg> Abonnements
+            <a href="{% url 'subscriptions' %}" {% if request.resolver_match.url_name == 'subscriptions' %}aria-current="page"{% endif %}>
+              <svg class="ico"><use href="#i-cal"/></svg><span>Abonnements</span>
             </a>
           </nav>
         </div>
@@ -110,7 +110,7 @@
           {% endfor %}
         </div>
       {% endif %}
-      <main id="contenu" class="{% if not user.is_authenticated or user.role != 'vendeuse' and not user.is_superuser %}mx-auto w-full max-w-3xl px-4 py-6{% endif %}">
+      <main id="contenu">
         {% block content %}{% endblock %}
       </main>
     </div>
