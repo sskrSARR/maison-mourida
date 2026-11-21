@@ -9,6 +9,7 @@ services:
     name: maison-mourida
     runtime: docker
     plan: free
+    region: frankfurt
     dockerfilePath: ./Dockerfile
     healthCheckPath: /sante/
     envVars:

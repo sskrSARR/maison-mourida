@@ -19,13 +19,15 @@ def wait_db():
     import psycopg
 
     dsn = url.replace("postgres://", "postgresql://", 1)
-    for _ in range(30):
+    last = "inconnu"
+    for _ in range(45):
         try:
             with psycopg.connect(dsn):
                 return
-        except Exception:
+        except Exception as exc:
+            last = type(exc).__name__
             time.sleep(1)
-    sys.exit("Base de données inaccessible")
+    sys.exit(f"Base de données inaccessible ({last})")
 
 
 if __name__ == "__main__":
